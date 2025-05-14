@@ -61,3 +61,61 @@ Resources:
             BatchSize: 10
       RuntimeManagementConfig:
         UpdateRuntimeOn: Auto
+
+  LambdaNotificationPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: arn:aws:iam::159447948044:role/CodePipelineServiceRole
+      ArtifactStore:
+        Type: S3
+        Location: epam-asobolev-test-website
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: 1
+              Configuration:
+                ConnectionArn: arn:aws:codeconnections:us-east-1:159447948044:connection/8a23406a-62b4-4a2b-9b3a-16476f06fa34
+                FullRepositoryId: rusobolev/lambda-notification
+                BranchName: master
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceOutput
+              RunOrder: 1
+
+        - Name: BuildAndDeploy
+          Actions:
+            - Name: BuildWithCodeBuild
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+              Configuration:
+                ProjectName: LambdaNotificationBuildProject
+              RunOrder: 1
+
+  LambdaNotificationBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: LambdaNotificationBuildProject
+      Source:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        PrivilegedMode: true
+      ServiceRole: arn:aws:iam::159447948044:role/CodeBuildServiceRole
+      Artifacts:
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 10
+
