@@ -4,8 +4,6 @@ phases:
   install:
     runtime-versions:
       nodejs: 22
-    commands:
-      - npm install -g aws-sam-cli
   build:
     commands:
       - sam build
