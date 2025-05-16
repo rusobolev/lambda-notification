@@ -62,6 +62,8 @@ Resources:
       RuntimeManagementConfig:
         UpdateRuntimeOn: Auto
 
+  #comment
+
   # LambdaNotificationPipeline:
   #   Type: AWS::CodePipeline::Pipeline
   #   Properties:
