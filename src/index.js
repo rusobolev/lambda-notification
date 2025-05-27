@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     try {
       return JSON.parse(record.body);
     } catch (e) {
-      return { error: "Invalid JSON in SQS message body", raw: record.body };
+      return { error: "Invalid JSON in SQS message body ", raw: record.body };
     }
   });
 
